@@ -1,3 +1,7 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+- Initial release, supports flutter V1.
+
+## 0.1.0
+
+- Supports Flutter V2.
