@@ -7,7 +7,9 @@ class SlidableCardList<T> extends StatefulWidget {
   final List<T> data;
   final Widget Function(T current, int index) builder;
   final void Function(T current, int index)? onTapWhenVisible;
-  final double spacing;
+
+  final double foldedSpacing;
+  final double unfoldedSpacing;
   final double itemsWidth;
   final Duration duration;
   const SlidableCardList({
@@ -17,7 +19,8 @@ class SlidableCardList<T> extends StatefulWidget {
     this.onTapWhenVisible,
     required this.duration,
     required this.builder,
-    this.spacing = 10,
+    this.foldedSpacing = 10,
+    this.unfoldedSpacing = 10,
   }) : super(key: key);
 
   @override
@@ -45,12 +48,14 @@ class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
             duration: widget.duration,
             margin: EdgeInsets.only(
               right: selectedItem < index && selectedItem != -1
-                  ? widget.itemsWidth
+                  ? widget.itemsWidth -
+                      widget.foldedSpacing +
+                      widget.unfoldedSpacing
                   : 0,
             ),
             child: Padding(
               padding: EdgeInsets.only(
-                right: widget.spacing * index,
+                right: widget.foldedSpacing * index,
               ),
               child: SizedBox(
                 width: widget.itemsWidth,
