@@ -15,14 +15,14 @@ class MyApp extends StatelessWidget {
             duration: const Duration(milliseconds: 400),
             itemsWidth: 100,
             foldedSpacing: 30,
-            unfoldedSpacing: 100,
-            data: List.generate(5, (index) => 'null'),
+            unfoldedSpacing: 10,
+            data: List.generate(6, (index) => 'null'),
             builder: (current, index) {
               return Container(
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: Colors.red,
+                  color: _getColor(index),
                   border: Border.all(
                     color: Colors.white,
                   ),
@@ -33,5 +33,14 @@ class MyApp extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  _getColor(int index) {
+    if (index == 0) return Colors.red;
+    if (index == 1) return Colors.blue;
+    if (index == 2) return Colors.orange;
+    if (index == 3) return Colors.green;
+    if (index == 4) return Colors.black;
+    return Colors.amber;
   }
 }

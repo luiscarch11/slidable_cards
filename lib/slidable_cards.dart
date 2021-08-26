@@ -7,6 +7,7 @@ class SlidableCardList<T> extends StatefulWidget {
   final List<T> data;
   final Widget Function(T current, int index) builder;
   final void Function(T current, int index) onTapWhenVisible;
+
   final double foldedSpacing;
   final double unfoldedSpacing;
   final double itemsWidth;
@@ -39,22 +40,17 @@ class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
     final builder = widget.builder;
 
     return Container(
-      child: Stack(
-        alignment: Alignment.topRight,
-        children: List.generate(
-          widget.data.length,
-          (index) => AnimatedContainer(
-            duration: widget.duration,
-            margin: EdgeInsets.only(
-              right: selectedItem < index && selectedItem != -1
-                  ? widget.itemsWidth -
-                      widget.foldedSpacing +
-                      widget.unfoldedSpacing
-                  : 0,
-            ),
-            child: Padding(
-              padding: EdgeInsets.only(
-                right: widget.foldedSpacing * index,
+      child: SingleChildScrollView(
+        reverse: true,
+        scrollDirection: Axis.horizontal,
+        child: Stack(
+          alignment: Alignment.topRight,
+          children: List.generate(
+            widget.data.length,
+            (index) => AnimatedContainer(
+              duration: widget.duration,
+              margin: EdgeInsets.only(
+                right: marginFromIndex(index),
               ),
               child: SizedBox(
                 width: widget.itemsWidth,
@@ -84,5 +80,14 @@ class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
         ),
       ),
     );
+  }
+
+  double marginFromIndex(int index) {
+    final _selectedAndCurrentDifferencePlusOne = index - selectedItem + 1;
+    return selectedItem <= index && selectedItem != -1
+        ? widget.foldedSpacing * (selectedItem - 1) +
+            widget.itemsWidth * (_selectedAndCurrentDifferencePlusOne) +
+            widget.unfoldedSpacing * (_selectedAndCurrentDifferencePlusOne)
+        : widget.foldedSpacing * index;
   }
 }
