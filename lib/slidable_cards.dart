@@ -48,17 +48,15 @@ class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
         controller: controller,
         scrollDirection: Axis.horizontal,
         child: GestureDetector(
-          onHorizontalDragUpdate: (details) {
-            controller.jumpTo(controller.offset + details.delta.dx);
-          },
-          onHorizontalDragEnd: (details) {
-            if (selectedItem == -1)
-              setState(
-                () {
-                  selectedItem = 0;
-                },
-              );
-          },
+          onHorizontalDragEnd: selectedItem == -1
+              ? (details) {
+                  setState(
+                    () {
+                      selectedItem = 0;
+                    },
+                  );
+                }
+              : null,
           child: Stack(
             alignment: Alignment.topRight,
             children: List.generate(
@@ -110,9 +108,11 @@ class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
   }
 
   double marginFromIndex(int index) {
-    final _selectedAndCurrentDifferencePlusOne = index - selectedItem + 1;
+    final _selectedAndCurrentDifferencePlusOne =
+        selectedItem == 0 ? index - selectedItem : index - selectedItem + 1;
+
     return selectedItem <= index && selectedItem != -1
-        ? widget.foldedSpacing * (selectedItem - 1) +
+        ? widget.foldedSpacing * (selectedItem == 0 ? 0 : selectedItem - 1) +
             widget.itemsWidth * (_selectedAndCurrentDifferencePlusOne) +
             widget.unfoldedSpacing * (_selectedAndCurrentDifferencePlusOne)
         : widget.foldedSpacing * index;
