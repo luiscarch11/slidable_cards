@@ -29,6 +29,7 @@ class SlidableCardList<T> extends StatefulWidget {
 
 class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
   var selectedItem = -1;
+
   ScrollController controller;
   @override
   void initState() {
@@ -46,46 +47,59 @@ class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
         reverse: true,
         controller: controller,
         scrollDirection: Axis.horizontal,
-        child: Stack(
-          alignment: Alignment.topRight,
-          children: List.generate(
-            widget.data.length,
-            (index) => AnimatedContainer(
-              duration: widget.duration,
-              onEnd: () {
-                // if (selectedItem != -1)
-              },
-              margin: EdgeInsets.only(
-                right: marginFromIndex(index),
-              ),
-              child: SizedBox(
-                width: widget.itemsWidth,
-                child: InkWell(
-                  splashColor: Colors.black,
-                  focusColor: Colors.black,
-                  hoverColor: Colors.black,
-                  highlightColor: Colors.black,
-                  onTap: () {
-                    setState(
-                      () {
-                        if (index == selectedItem ||
-                            (index == data.length - 1)) {
-                          widget.onTapWhenVisible?.call(data[index], index);
-                          selectedItem = -1;
-                          return;
-                        }
-                        selectedItem = index;
-                      },
-                    );
-                    controller.animateTo(
-                      marginFromIndex(selectedItem) - widget.unfoldedSpacing,
-                      duration: const Duration(
-                        milliseconds: 500,
-                      ),
-                      curve: Curves.decelerate,
-                    );
-                  },
-                  child: builder(data[index], index),
+        child: GestureDetector(
+          onHorizontalDragUpdate: (details) {
+            controller.jumpTo(controller.offset + details.delta.dx);
+          },
+          onHorizontalDragEnd: (details) {
+            if (selectedItem == -1)
+              setState(
+                () {
+                  selectedItem = 0;
+                },
+              );
+          },
+          child: Stack(
+            alignment: Alignment.topRight,
+            children: List.generate(
+              widget.data.length,
+              (index) => AnimatedContainer(
+                duration: widget.duration,
+                onEnd: () {
+                  controller.animateTo(
+                    marginFromIndex(selectedItem) - widget.unfoldedSpacing,
+                    duration: Duration(
+                      milliseconds:
+                          (widget.duration.inMilliseconds * .8).floor(),
+                    ),
+                    curve: Curves.decelerate,
+                  );
+                },
+                margin: EdgeInsets.only(
+                  right: marginFromIndex(index),
+                ),
+                child: SizedBox(
+                  width: widget.itemsWidth,
+                  child: InkWell(
+                    splashColor: Colors.black,
+                    focusColor: Colors.black,
+                    hoverColor: Colors.black,
+                    highlightColor: Colors.black,
+                    onTap: () {
+                      setState(
+                        () {
+                          if (index == selectedItem ||
+                              (index == data.length - 1)) {
+                            widget.onTapWhenVisible?.call(data[index], index);
+                            selectedItem = -1;
+                            return;
+                          }
+                          selectedItem = index;
+                        },
+                      );
+                    },
+                    child: builder(data[index], index),
+                  ),
                 ),
               ),
             ),
