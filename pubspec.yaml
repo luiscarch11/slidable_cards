@@ -1,6 +1,6 @@
 name: slidable_cards
 description: A new Flutter package project.
-version: 0.0.3
+version: 0.0.4
 homepage: https://github.com/luiscarch11/slidable_cards
 
 environment:
@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  
 
 dev_dependencies:
   flutter_test:

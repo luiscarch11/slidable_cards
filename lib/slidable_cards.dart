@@ -29,8 +29,10 @@ class SlidableCardList<T> extends StatefulWidget {
 
 class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
   var selectedItem = -1;
+  ScrollController controller;
   @override
   void initState() {
+    controller = ScrollController();
     super.initState();
   }
 
@@ -42,6 +44,7 @@ class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
     return Container(
       child: SingleChildScrollView(
         reverse: true,
+        controller: controller,
         scrollDirection: Axis.horizontal,
         child: Stack(
           alignment: Alignment.topRight,
@@ -49,6 +52,9 @@ class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
             widget.data.length,
             (index) => AnimatedContainer(
               duration: widget.duration,
+              onEnd: () {
+                // if (selectedItem != -1)
+              },
               margin: EdgeInsets.only(
                 right: marginFromIndex(index),
               ),
@@ -70,6 +76,13 @@ class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
                         }
                         selectedItem = index;
                       },
+                    );
+                    controller.animateTo(
+                      marginFromIndex(selectedItem) - widget.unfoldedSpacing,
+                      duration: const Duration(
+                        milliseconds: 500,
+                      ),
+                      curve: Curves.decelerate,
                     );
                   },
                   child: builder(data[index], index),
