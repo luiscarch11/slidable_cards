@@ -5,7 +5,11 @@ import 'package:flutter/material.dart';
 
 class SlidableCardList<T> extends StatefulWidget {
   final List<T> data;
-  final Widget Function(T current, int index) builder;
+  final Widget Function(
+    T current,
+    int index,
+    bool isExpanded,
+  ) builder;
   final void Function(T current, int index) onTapWhenVisible;
 
   final double foldedSpacing;
@@ -96,7 +100,7 @@ class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
                         },
                       );
                     },
-                    child: builder(data[index], index),
+                    child: builder(data[index], index, index >= selectedItem),
                   ),
                 ),
               ),

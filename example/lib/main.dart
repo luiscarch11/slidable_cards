@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
           itemsWidth: 360,
           foldedSpacing: 30,
           unfoldedSpacing: 16,
-          builder: (current, index) => Container(
+          builder: (current, index, _) => Container(
             height: 100,
             decoration: BoxDecoration(
               border: Border.all(
