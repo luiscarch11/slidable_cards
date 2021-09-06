@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
             title: Text('Material App Bar'),
           ),
           body: SlidableCardList(
+            onTap: () => print('tapped'),
             cardsController: controller,
             duration: const Duration(milliseconds: 400),
             data: List.generate(

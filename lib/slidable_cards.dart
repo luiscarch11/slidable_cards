@@ -11,18 +11,23 @@ class SlidableCardList<T> extends StatefulWidget {
     int index,
     bool isExpanded,
   ) builder;
-  final void Function(T current, int index) onTapWhenVisible;
+  final void Function(
+    T current,
+    int index,
+  ) onTapWhenVisible;
 
   final double foldedSpacing;
   final double unfoldedSpacing;
   final double itemsWidth;
   final SlidableCardsController cardsController;
   final Duration duration;
+  final VoidCallback onTap;
   const SlidableCardList({
     Key key,
     this.data = const [],
     @required this.itemsWidth,
     this.onTapWhenVisible,
+    this.onTap,
     this.cardsController,
     @required this.duration,
     @required this.builder,
@@ -116,6 +121,7 @@ class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
   }
 
   void onSelectItem(int index) {
+    widget.onTap?.call();
     setState(
       () {
         if (index == selectedItem || (index == widget.data.length - 1)) {
