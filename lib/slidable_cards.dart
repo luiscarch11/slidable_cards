@@ -2,6 +2,7 @@ library slidable_cards;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:slidable_cards/models/slidable_cards_controller.dart';
 
 class SlidableCardList<T> extends StatefulWidget {
   final List<T> data;
@@ -15,12 +16,14 @@ class SlidableCardList<T> extends StatefulWidget {
   final double foldedSpacing;
   final double unfoldedSpacing;
   final double itemsWidth;
+  final SlidableCardsController cardsController;
   final Duration duration;
   const SlidableCardList({
     Key key,
     this.data = const [],
     @required this.itemsWidth,
     this.onTapWhenVisible,
+    this.cardsController,
     @required this.duration,
     @required this.builder,
     this.foldedSpacing = 10,
@@ -33,11 +36,21 @@ class SlidableCardList<T> extends StatefulWidget {
 
 class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
   var selectedItem = -1;
-
-  ScrollController controller;
+  SlidableCardsController _controller;
+  ScrollController _scrollController;
   @override
   void initState() {
-    controller = ScrollController();
+    _scrollController = ScrollController();
+    _controller = widget.cardsController ?? SlidableCardsController();
+    _controller.addListener(
+      () {
+        setState(
+          () {
+            selectedItem = _controller.selectedItem;
+          },
+        );
+      },
+    );
     super.initState();
   }
 
@@ -49,14 +62,14 @@ class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
     return Container(
       child: SingleChildScrollView(
         reverse: true,
-        controller: controller,
+        controller: _scrollController,
         scrollDirection: Axis.horizontal,
         child: GestureDetector(
           onHorizontalDragEnd: selectedItem == -1
               ? (details) {
                   setState(
                     () {
-                      selectedItem = 0;
+                      _controller.unstack(0);
                     },
                   );
                 }
@@ -64,11 +77,11 @@ class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
           child: Stack(
             alignment: Alignment.topRight,
             children: List.generate(
-              widget.data.length,
+              data.length,
               (index) => AnimatedContainer(
                 duration: widget.duration,
                 onEnd: () {
-                  controller.animateTo(
+                  _scrollController.animateTo(
                     marginFromIndex(selectedItem) - widget.unfoldedSpacing,
                     duration: Duration(
                       milliseconds:
@@ -88,19 +101,10 @@ class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
                     hoverColor: Colors.black,
                     highlightColor: Colors.black,
                     onTap: () {
-                      setState(
-                        () {
-                          if (index == selectedItem ||
-                              (index == data.length - 1)) {
-                            widget.onTapWhenVisible?.call(data[index], index);
-                            selectedItem = -1;
-                            return;
-                          }
-                          selectedItem = index;
-                        },
-                      );
+                      onSelectItem(index);
                     },
-                    child: builder(data[index], index, index >= selectedItem),
+                    child: builder(data[index], index,
+                        index >= selectedItem && selectedItem != -1),
                   ),
                 ),
               ),
@@ -108,6 +112,19 @@ class _SlidableCardListState<T> extends State<SlidableCardList<T>> {
           ),
         ),
       ),
+    );
+  }
+
+  void onSelectItem(int index) {
+    setState(
+      () {
+        if (index == selectedItem || (index == widget.data.length - 1)) {
+          widget.onTapWhenVisible?.call(widget.data[index], index);
+          _controller.restack();
+          return;
+        }
+        _controller.unstack(index);
+      },
     );
   }
 
